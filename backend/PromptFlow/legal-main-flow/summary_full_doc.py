@@ -61,7 +61,7 @@ def get_policyinfo(policyid:int ,ally:CustomConnection):
     results = search_client.search(
         search_text="*", filter=filter_expr,
         select=["id", "title", "instruction", "tags", "severity"],  # <- list
-        
+    )
     results_list = [result for result in results]
     return results_list[0] if results_list else None
      

@@ -28,7 +28,7 @@ fetch("assets/config.json")
 Office.onReady(async (info) => {
   if (info.host === Office.HostType.Word) {
     document.getElementById("sideload-msg").style.display = "block"; 
-    const filename = Office.context.document.url.split('\\').pop().split('/').pop()
+    const filename = Office.context.document.url.split('\\').pop().split('/').pop() //fetching filename from Word API
     localStorage.setItem('filename', filename);
 
     
@@ -171,16 +171,222 @@ export async function reset_cache() {
 
 // Index document function - Demo now but will be implemented in the future with Azure Search, Prompt Flow
 export async function index_document() {
-  // sleep to 2 seconds
-  document.getElementById("index-doc-spinner").style.display = "flex";
-  await new Promise(r => setTimeout(r, 2000));
-  document.getElementById("index-doc-spinner").style.display = "none";
-  
-  // chnage the conainter index-doc-container style to display none
-  var reviewcontainerDiv = document.getElementById("index-doc-container");
-  reviewcontainerDiv.style.display = "none";
+  const spinner = document.getElementById("index-doc-spinner");
+  const reviewContainer = document.getElementById("index-doc-container");
+  const indexbutton = document.getElementById("index-doc-button"); 
+  // Show spinner and hide container
+  spinner.style.display = "flex";
+  indexbutton.style.display = "none"; 
+  reviewContainer.style.display = "block"; 
 
-  showSuccessMessage("Document has been indexed successfully");
+  // ✅ Change background color to light green
+
+  reviewContainer.style.backgroundColor = "#e6f5e6"; // light green
+  reviewContainer.style.border = "1px solid #ffffffff"; // green border
+  reviewContainer.style.borderRadius = "10px";
+
+
+
+  // Update heading to show "Indexing in progress..."
+
+  const heading = reviewContainer.querySelector("h2");
+  if (heading) {
+    heading.textContent = "⏳Preparing Document";
+    heading.style.color = "black";
+    heading.style.fontWeight = "bold";
+
+  }
+
+
+
+  // Hide all <p> tags temporarily
+
+  const pTags = reviewContainer.querySelectorAll("p");
+  pTags.forEach((p) => {p.style.display = "none"; p.style.color = "black"; });
+
+
+
+  try {
+
+    // Get function-app endpoint
+
+    const contract_index_endpoint = localStorage.getItem('contractindexendpoint');
+    const filename = localStorage.getItem('filename');
+    const response = await fetch(contract_index_endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+
+      body: JSON.stringify({
+        filename: filename
+      })
+    });
+
+    const message = await response.text(); 
+
+    if (response.ok) {
+      console.log("Response: ok");
+      // 1. Change the heading with a professional icon (balloon or checkmark)
+      const heading = reviewContainer.querySelector('h2');
+      if (heading) {
+        heading.innerHTML = '✅Document Ready'; 
+      }
+
+      // 2. Light success styling for the whole container
+      reviewContainer.style.backgroundColor = '#d4edda';     // Light green (success)
+      reviewContainer.style.border = '1px solid #c3e6cb';     // Success border
+      reviewContainer.style.borderRadius = '8px';
+      reviewContainer.style.padding = '16px';
+      reviewContainer.style.color = '#155724';                // Dark green text for success
+
+      // 3. Update the first paragraph
+
+      const pTags = reviewContainer.querySelectorAll('p');
+      if (pTags.length > 0) {
+        pTags[0].innerHTML = 'Your document is prepared. <br> 🎉 Your tool is now ready-to-use.';
+        pTags[0].style.display = 'block';
+        pTags[0].style.fontWeight = '500';
+
+      }
+
+
+
+      // 4. Remove the second paragraph if present
+
+      if (pTags.length > 1) {
+        pTags[1].remove();
+      }
+
+
+
+      // 5. Remove spinner and button
+
+      if (spinner) spinner.remove();
+      if (indexbutton) indexbutton.remove();
+
+
+
+    } else {
+      // 1. Change the heading
+      console.log("Response: bad");
+      const heading = reviewContainer.querySelector('h2');
+      if (heading) {
+        heading.textContent = '❌Document Not Ready';
+      }
+
+
+
+      // 1. Light red background for the entire review container
+
+      reviewContainer.style.backgroundColor = '#f8d7da';  // Light red
+      reviewContainer.style.border = '1px solid #f5c6cb'; // Border similar to Bootstrap danger alert
+      reviewContainer.style.borderRadius = '8px';
+      reviewContainer.style.padding = '16px';
+
+      // 2. Modify the first paragraph with an outlined inner box for the message
+      const pTags = reviewContainer.querySelectorAll('p');
+      if (pTags.length > 0) {
+        pTags[0].innerHTML = `
+          Your document could not be prepared. It could be due to the following issue:<br>
+          <div style="border: 1px solid #f5c6cb; background-color: #fef2f2; padding: 10px; border-radius: 4px; margin-top: 8px;">
+            ${message}
+          </div>`;
+        pTags[0].style.display = 'block';
+        pTags[0].style.color = '#721c24';  // Text color for error
+      }
+
+
+
+      // 3. Remove the second paragraph if it exists
+
+      if (pTags.length > 1) {
+
+        pTags[1].remove();
+
+      }
+
+
+
+      // 4. Spinner and button visibility
+
+      spinner.style.display = "none";
+
+      indexbutton.style.display = "block";
+
+    }
+
+  } 
+
+  catch (error) {
+
+    console.log("%cNetwork or server error: " + error.message, "color: red");
+
+    // show to user
+
+    const heading = reviewContainer.querySelector('h2');
+
+    if (heading) {
+
+      heading.textContent = '❌Document Not Ready';
+
+    }
+
+
+
+    // 1. Light red background for the entire review container
+
+    reviewContainer.style.backgroundColor = '#f8d7da';  // Light red
+
+    reviewContainer.style.border = '1px solid #f5c6cb'; // Border similar to Bootstrap danger alert
+
+    reviewContainer.style.borderRadius = '8px';
+
+    reviewContainer.style.padding = '16px';
+
+
+
+    // 2. Modify the first paragraph with an outlined inner box for the message
+
+    const pTags = reviewContainer.querySelectorAll('p');
+
+    if (pTags.length > 0) {
+
+      pTags[0].innerHTML = `
+
+        Your document could not be prepared. It could be due to the following issue:<br>
+
+        <div style="border: 1px solid #f5c6cb; background-color: #fef2f2; padding: 10px; border-radius: 4px; margin-top: 8px;">
+
+          Error connecting to Function app.
+
+        </div>`;
+
+      pTags[0].style.display = 'block';
+
+      pTags[0].style.color = '#721c24';  // Text color for error
+
+    }
+
+
+
+    // 3. Remove the second paragraph if it exists
+
+    if (pTags.length > 1) {
+
+      pTags[1].remove();
+
+    }
+
+
+
+    // 4. Spinner and button visibility
+    spinner.style.display = "none";
+    indexbutton.style.display = "block";
+  } 
+  finally {
+    console.log("End of Indexing button function.");
+  }
 }
 
 // Function to display a success message on the top ribbon

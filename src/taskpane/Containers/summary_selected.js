@@ -341,11 +341,12 @@ function fixText(correctedText) {
   Word.run(async (context) => {  
       const selection = context.document.getSelection();  
       selection.load("text");  
+      selection.font.strikeThrough = true;
       await context.sync();  
 
       // Replace the selected text with the corrected text  
-      selection.insertText(correctedText, Word.InsertLocation.replace);  
-
+      selection.insertText(correctedText, Word.InsertLocation.after); 
+      
       //insertCorrectedText(selectedOoxml) <------ Not working - not saving the formatting
 
       await context.sync();  

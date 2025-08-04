@@ -22,7 +22,7 @@ class SummaryResponse(BaseModel):
 
 
 @tool
-def python_tool(input_text: str, ally:CustomConnection) -> object:
+def python_tool(input_text: str, filename: str, ally:CustomConnection) -> object:
     
     search_endpoint = ally.search_endpoint
     search_index = ally.search_document_index
@@ -44,10 +44,9 @@ def python_tool(input_text: str, ally:CustomConnection) -> object:
                 # log into promptflow a warning                
                 policy = get_policyinfo(policyid,ally)
                 policylist.append(policy)
-            list.append({"title": result["title"], "summary": result["summary"], "keyphrases": result["keyphrases"], "summary": result["summary"], "isCompliant": result["isCompliant"], "CompliantCollection": result["CompliantCollection"], "NonCompliantCollection": result["NonCompliantCollection"], "NonCompliantPolicies": policylist})           
+            list_.append({"title": result["title"], "summary": result["summary"], "keyphrases": result["keyphrases"], "paragraph": result["paragraph"], "isCompliant": result["isCompliant"], "CompliantCollection": result["CompliantCollection"], "NonCompliantCollection": result["NonCompliantCollection"], "NonCompliantPolicies": policylist})             
         else:    
-            list.append({"title": result["title"], "summary": result["summary"], "keyphrases": result["keyphrases"], "summary": result["summary"], "isCompliant": result["isCompliant"], "CompliantCollection": result["CompliantCollection"], "NonCompliantCollection": result["NonCompliantCollection"]})
-    print(list)
+            list_.append({"title": result["title"], "summary": result["summary"], "keyphrases": result["keyphrases"], "paragraph": result["paragraph"], "isCompliant": result["isCompliant"], "CompliantCollection": result["CompliantCollection"], "NonCompliantCollection": result["NonCompliantCollection"]})
     return list
 
 
@@ -56,12 +55,13 @@ def get_policyinfo(policyid:int ,ally:CustomConnection):
     search_index = ally.search_policy_index
     search_key = ally.search_key
     # use ai azure search to query 
-
+    
+    filter_expr = f"PolicyId eq '{policyid}'"
     search_client = SearchClient(search_endpoint, search_index, AzureKeyCredential(search_key))
     results = search_client.search(
-        filter = f"PolicyId eq '{PolicyId}'",
-        select = ["id", "title", "instruction", "tags", "severity"]
-    )
+        search_text="*", filter=filter_expr,
+        select=["id", "title", "instruction", "tags", "severity"],  # <- list
+        
     results_list = [result for result in results]
     return results_list[0] if results_list else None
      

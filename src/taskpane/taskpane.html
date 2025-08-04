@@ -92,16 +92,18 @@
 
         <!--- Create a button to index the current document -->
         <!--  I need to have a script running in the background to index the document and when it is done, I will show a message that the document is indexed and ready for search and review. -->
-        <div class="container" id="index-doc-container" style="display: none;">
-            <h2>Index is Missing</h2>
-            <p>Your document <b id="filename-notindexed-label"></b> seems to be <b>not</b> Indexed, For all Ai functions to work you must press the Index button</p>
-            <p>This process may take a few minutes</p>
-            <p>Index your contract to enable semantic search and review</p>
+        <div class="container" id="index-doc-container" style="display: none; background-color: #ffe5e5; border: 1px solid #ff9999; border-radius: 8px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <h2 style="color: #b30000; margin-top: 0;">⚠️ Document Not Ready</h2>
+            <p style="color: #5c0000; font-size: 15px;">
+                Your document hasn't been prepared yet. Please press the <b>Index Now</b> button to use all the AI features.
+            </p>
+            <b id="filename-notindexed-label" style="display: none;"></b>
             <div id="index-doc-spinner" style="display: none;" class="spinner"></div>
-            <button class="ms-Button ms-Button--primary search-button" id="index-doc-button">
+            <button class="ms-Button ms-Button--primary search-button" id="index-doc-button" style="margin-top: 12px; background-color:#003049; border: none;">
                 <span class="ms-Button-label">Index Now</span>
             </button>
         </div>
+        
         <br>
 
         <div id="summary-container" class="container">

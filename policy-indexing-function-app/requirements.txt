@@ -1,0 +1,11 @@
+azure-functions
+requests
+python-docx
+pytesseract
+PyMuPDF
+pillow
+langdetect
+langcodes
+openai
+azure-core
+azure-search-documents

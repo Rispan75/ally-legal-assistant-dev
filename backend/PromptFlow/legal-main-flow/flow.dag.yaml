@@ -16,7 +16,7 @@ inputs:
       submit to the jurisdiction of the courts of Singapore. "
   query_type:
     type: int
-    default: 2
+    default: 10
   group:
     type: list
     default:
@@ -87,6 +87,7 @@ nodes:
     input3: ${summary_full_doc.output}
     input4: ${ask_result_format.output}
     input5: ${check_index.output}
+    input6: ${iteration_tool.output}
   aggregation: false
 - name: summary_full_doc
   type: python
@@ -94,6 +95,7 @@ nodes:
     type: code
     path: summary_full_doc.py
   inputs:
+    filename: ${inputs.filename} 
     input_text: ${inputs.question}
     ally: ally
   activate:
@@ -161,3 +163,16 @@ nodes:
     type: code
     path: prompt_node_9e7r.jinja2
   inputs: {}
+
+- name: iteration_tool
+  type: python
+  source:
+    type: code
+    path: iteration.py
+  inputs:
+    searchconnection: ally
+    filename: ${inputs.filename}
+    language: ${inputs.language}
+  activate:
+    when: ${inputs.query_type}
+    is: 10

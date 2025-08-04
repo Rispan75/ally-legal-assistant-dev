@@ -27,14 +27,14 @@ export async function document_summary() {
         
             
         //localStorage.setItem('filename', properties.title);
-
-
+      localStorage.removeItem('FullSummaryData');
       if (localStorage.getItem('FullSummaryData') == null) {
         // const properties = context.document.properties; extract file properties. may be usfull later
         // properties.load()
         // await context.sync();
         console.log(pfendpoint);
               // Make the API call to get the data  ---------- Remember to remove this line ---------------
+        console.log("Summary data function has been trigerred."); 
         const response = await fetch(pfendpoint, {
             method: 'POST',
             headers: {

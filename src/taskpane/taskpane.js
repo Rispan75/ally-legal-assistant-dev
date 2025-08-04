@@ -60,6 +60,7 @@ Office.onReady(async (info) => {
           document.getElementById("fetchPolicyData").onclick = summary;
           document.getElementById("fetchSummaryData").onclick = document_summary;
           document.getElementById("reset-button").onclick = reset_cache;
+          document.getElementById("iteration-button").onclick = iteration_logic;
         }, 1000);
       }
       else
@@ -507,3 +508,182 @@ async function fetchData(endpoint, filename, groups ) {
       })  
   });  
 }  
+
+
+export async function iteration_logic() {  
+
+  const spinner = document.getElementById("iteration-spinner");
+
+  const reviewContainer = document.getElementById("iteration-container");
+
+  const indexbutton = document.getElementById("iteration-button");
+
+ 
+
+ 
+
+  // Show spinner and hide container
+
+  spinner.style.display = "flex";
+
+  indexbutton.disabled = true;
+
+  indexbutton.classList.add("disabled-style");
+
+ 
+
+  reviewContainer.style.display = "block";
+
+ 
+
+ 
+
+  // Get function-app endpoint
+
+  const pfendpoint = localStorage.getItem('pfendpoint');
+
+  const filename = localStorage.getItem('filename');
+
+  const language = localStorage.getItem('language');
+
+ 
+
+ 
+
+  const response = await fetch(pfendpoint, {
+
+    method: 'POST',
+
+    headers: {
+
+      'Content-Type': 'application/json'
+
+    },
+
+    body: JSON.stringify({
+
+      query_type: 10,
+
+      filename: filename,
+
+      language: language,
+
+    })
+
+  });
+
+ 
+
+  const message = await response.text();
+
+  console.log(message);
+
+ 
+
+  const pmessage = JSON.parse(message); // ✅ Use a different variable name
+
+ 
+
+  indexbutton.disabled = false;
+  indexbutton.classList.remove("disabled-style");
+
+  if (response.ok) {
+    reviewContainer.style.display = "block";
+    spinner.style.display = "none";
+
+let formatted = `<h2 style="margin-bottom: 20px; font-size: 22px; font-weight: 600; color: #2c3e50;">Unused Policies</h2>`;
+pmessage.answer.forEach((item, index) => {
+  formatted += `
+    <div style="
+      margin-bottom: 24px;
+      border-radius: 16px;
+      background-color: #ffffff;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    ">
+      <div style="
+        background: linear-gradient(90deg, #3a8bfd, #2c52ff);
+        color: #ffffff;
+        font-weight: bold;
+        padding: 14px 18px;
+        font-size: 16px;
+      ">
+        Policy - ${index + 1}
+
+      </div>
+
+      <div style="
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      ">
+
+
+        <div style="
+
+          border: 1px solid #e0e0e0;
+
+          background-color: #fafafa;
+
+          padding: 12px;
+
+          border-radius: 10px;
+
+        ">
+
+          <div style="font-weight: bold; color: #004aad; margin-bottom: 4px;">Title</div>
+
+          <div style="color: #333;">${item.Title}</div>
+
+        </div>
+
+ 
+
+        <div style="
+
+          border: 1px solid #e0e0e0;
+
+          background-color: #fafafa;
+
+          padding: 12px;
+
+          border-radius: 10px;
+
+        ">
+
+          <div style="font-weight: bold; color: #004aad; margin-bottom: 4px;">Summary</div>
+
+          <div style="color: #333;">${item.summary}</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+});
+
+ 
+
+ 
+
+ 
+
+    document.getElementById("iteration-container").innerHTML = formatted;
+
+  } else {
+
+    reviewContainer.style.display = "block";
+
+    spinner.style.display = "none";
+
+    document.getElementById("iteration-container").innerText = "Operation Failed";
+
+ 
+
+  }
+
+}

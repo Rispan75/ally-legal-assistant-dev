@@ -6,7 +6,8 @@ import logging
 # Adding type to arguments and return value will help the system show the types properly
 # Please update the function name/signature per need
 @tool
-def my_python_tool(input1: object, input2: object, input3: object, input4: object, input5: object) -> object:
+def my_python_tool(input1: object, input2: object, input3: object, input4: object, input5: object,input6: object) -> object:
+
     #check witch input is not null and return it
     
     if input1:
@@ -21,6 +22,6 @@ def my_python_tool(input1: object, input2: object, input3: object, input4: objec
         out = {"Found": input5}
         return out
     else:
-        return "Both inputs are null"
+        return "All inputs are null!"
 
     

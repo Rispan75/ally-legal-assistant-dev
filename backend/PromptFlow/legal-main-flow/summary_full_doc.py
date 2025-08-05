@@ -34,7 +34,7 @@ def python_tool(input_text: str, filename: str, ally:CustomConnection) -> object
         search_text="*",  # Use '*' to match all documents
         order_by=["ParagraphId"],
     )
-    list = []
+    list_ = []
     for result in results:
         #title,paragraph,keyphrases,summary,isCompliant,CompliantCollection,NonCompliantCollection
         # if is compliant false read the NonCompliantCollection list and run the get_policyinfo function
@@ -47,7 +47,7 @@ def python_tool(input_text: str, filename: str, ally:CustomConnection) -> object
             list_.append({"title": result["title"], "summary": result["summary"], "keyphrases": result["keyphrases"], "paragraph": result["paragraph"], "isCompliant": result["isCompliant"], "CompliantCollection": result["CompliantCollection"], "NonCompliantCollection": result["NonCompliantCollection"], "NonCompliantPolicies": policylist})             
         else:    
             list_.append({"title": result["title"], "summary": result["summary"], "keyphrases": result["keyphrases"], "paragraph": result["paragraph"], "isCompliant": result["isCompliant"], "CompliantCollection": result["CompliantCollection"], "NonCompliantCollection": result["NonCompliantCollection"]})
-    return list
+    return list_
 
 
 def get_policyinfo(policyid:int ,ally:CustomConnection):
@@ -59,9 +59,10 @@ def get_policyinfo(policyid:int ,ally:CustomConnection):
     filter_expr = f"PolicyId eq '{policyid}'"
     search_client = SearchClient(search_endpoint, search_index, AzureKeyCredential(search_key))
     results = search_client.search(
-        search_text="*", filter=filter_expr,
-        select=["id", "title", "instruction", "tags", "severity"],  # <- list
-    )
+        search_text="*", #filter=filter_expr,
+        
+        select=["id", "title", "summary", "tags", "severity"],  
+    ) 
     results_list = [result for result in results]
     return results_list[0] if results_list else None
      

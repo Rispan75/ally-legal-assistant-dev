@@ -106,11 +106,13 @@ function displaySearchResults(data) {
   container.appendChild(answerDiv);  
 
   // check if there are search results not empty. the SearchResults:  undefined
+  /*
   if (data.SearchResults !== undefined && data.SearchResults.length > 0) {
     console.log("SearchResults: ", data.SearchResults);
     const resultsDiv = createResultsDiv(data.SearchResults);  
     container.appendChild(resultsDiv);
   }
+  */
 
   const tryAgainButton = createTryAgainButton();  
   container.appendChild(tryAgainButton);  

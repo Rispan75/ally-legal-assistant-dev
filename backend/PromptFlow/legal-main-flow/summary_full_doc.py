@@ -23,47 +23,67 @@ class SummaryResponse(BaseModel):
 
 @tool
 def python_tool(input_text: str, filename: str, ally:CustomConnection) -> object:
-    
     search_endpoint = ally.search_endpoint
     search_index = ally.search_document_index
-    search_key = ally.search_key
+    search_key = ally.search_key 
     # use ai azure search to query 
-
     search_client = SearchClient(search_endpoint, search_index, AzureKeyCredential(search_key))
     results = search_client.search(
         search_text="*",  # Use '*' to match all documents
+        filter="filename eq '{}'".format(filename),
         order_by=["ParagraphId"],
-    )
+    ) 
+    
     list_ = []
     for result in results:
         #title,paragraph,keyphrases,summary,isCompliant,CompliantCollection,NonCompliantCollection
         # if is compliant false read the NonCompliantCollection list and run the get_policyinfo function
         if result["isCompliant"] == False:
-            policylist = []
+            policylist = []  
             for policyid in result["NonCompliantCollection"]:
                 # log into promptflow a warning                
                 policy = get_policyinfo(policyid,ally)
                 policylist.append(policy)
-            list_.append({"title": result["title"], "summary": result["summary"], "keyphrases": result["keyphrases"], "paragraph": result["paragraph"], "isCompliant": result["isCompliant"], "CompliantCollection": result["CompliantCollection"], "NonCompliantCollection": result["NonCompliantCollection"], "NonCompliantPolicies": policylist})             
+            list_.append({"title": result["title"], "summary": result["summary"], "keyphrases": result["keyphrases"], "paragraph": result["paragraph"], "isCompliant": result["isCompliant"], "CompliantCollection": result["CompliantCollection"], "NonCompliantCollection": result["NonCompliantCollection"], "NonCompliantPolicies": policylist})           
         else:    
             list_.append({"title": result["title"], "summary": result["summary"], "keyphrases": result["keyphrases"], "paragraph": result["paragraph"], "isCompliant": result["isCompliant"], "CompliantCollection": result["CompliantCollection"], "NonCompliantCollection": result["NonCompliantCollection"]})
-    return list_
+    return list_ 
 
 
-def get_policyinfo(policyid:int ,ally:CustomConnection):
+def get_policyinfo(policyid:str ,ally:CustomConnection):
+    print("triggering pinfo summary")
     search_endpoint = ally.search_endpoint
     search_index = ally.search_policy_index
     search_key = ally.search_key
     # use ai azure search to query 
-    
+    print("policy number = ",policyid)
     filter_expr = f"PolicyId eq '{policyid}'"
     search_client = SearchClient(search_endpoint, search_index, AzureKeyCredential(search_key))
     results = search_client.search(
-        search_text="*", #filter=filter_expr,
-        
-        select=["id", "title", "instruction", "summary", "tags", "severity"],  
+        search_text="*", 
+        select=["id", "title", "instruction", "summary", "tags", "severity"],  # <- list
     ) 
     results_list = [result for result in results]
+
     final_results_list = results_list[0] if results_list else None
     return final_results_list
-     
+
+#get_policyinfo function replicated with filter expression for iteration button
+def get_policyinfo_iteration(policyid:str ,ally:CustomConnection):
+    print("triggering pinfo iteration")
+    search_endpoint = ally.search_endpoint
+    search_index = ally.search_policy_index
+    search_key = ally.search_key
+    # use ai azure search to query 
+    print("policy number = ",policyid)
+    filter_expr = f"PolicyId eq '{policyid}'"
+    search_client = SearchClient(search_endpoint, search_index, AzureKeyCredential(search_key))
+    results = search_client.search(
+        search_text="*",
+        filter=filter_expr,
+        select=["id", "title", "instruction", "summary", "tags", "severity"],  # <- list
+    )
+    results_list = [result for result in results]
+
+    final_results_list = results_list[0] if results_list else None
+    return final_results_list

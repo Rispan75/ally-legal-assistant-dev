@@ -3,7 +3,7 @@ from azure.search.documents import SearchClient
 from azure.core.credentials import AzureKeyCredential
 from promptflow.core import tool
 from promptflow.connections import CustomConnection
-from summary_full_doc import get_policyinfo
+from summary_full_doc import get_policyinfo_iteration
  
  
 # ------------------------------
@@ -27,8 +27,8 @@ def iterative_tool(searchconnection: CustomConnection, filename: str,language: s
     # Step 1: Fetch all policy_ids from instruction index filtered by language
     #logger.info(f"Fetching policy IDs from instruction index filtered by language: {language}")
     instruction_filter = f"language eq '{language}'"
-    instruction_results = list(instruction_client.search(search_text="*"))
-    #instruction_results = list(instruction_client.search(search_text="*", filter=instruction_filter))
+    #instruction_results = list(instruction_client.search(search_text="*"))
+    instruction_results = list(instruction_client.search(search_text="*", filter=instruction_filter))
     print("instruction_results  ",  instruction_results)
     print("Policy Index:", searchconnection.search_policy_index)
     print("Endpoint:", searchconnection.search_endpoint)
@@ -62,7 +62,7 @@ def iterative_tool(searchconnection: CustomConnection, filename: str,language: s
     result_list = []
  
     for policy_id in sorted(unused_policies):
-        policy_info = get_policyinfo(policy_id, searchconnection)
+        policy_info = get_policyinfo_iteration(policy_id, searchconnection)
         result_list.append({
             #"PolicyId": policy_id,
             #"Title": policy_info.get("title", "N/A") if policy_info else "N/A",

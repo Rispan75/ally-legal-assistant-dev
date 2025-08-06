@@ -196,7 +196,7 @@ function displaySummaryData1(policyData) {
           
           contentDiv.appendChild(keyItemsDiv);
       }
-  
+  /*
       const goToButton = document.createElement("button");
           goToButton.classList.add("search-button");
           goToButton.textContent = "Go to";
@@ -206,7 +206,8 @@ function displaySummaryData1(policyData) {
           });
           
           contentDiv.appendChild(goToButton);
-  
+  */
+        
         // Append the content div to the item container
         itemDiv.appendChild(contentDiv);
         container.appendChild(itemDiv);
@@ -373,6 +374,7 @@ if (Array.isArray(section.NonCompliantPolicies) && section.NonCompliantPolicies.
       policySeverity.textContent = "Severity: ";
       policySeverity.appendChild(severityText);
 
+      /*
       // Policy Tags styled as tags in the main code
       const policyTagsDiv = document.createElement("div");
       policyTagsDiv.classList.add("key-items"); // Reuse tag styling
@@ -383,12 +385,13 @@ if (Array.isArray(section.NonCompliantPolicies) && section.NonCompliantPolicies.
           tagElement.textContent = tag;
           policyTagsDiv.appendChild(tagElement);
       });
-
+*/
+      
       // Append all details to the policyContainer
       policyContainer.appendChild(policyTitle);
       policyContainer.appendChild(policyInstruction);
       policyContainer.appendChild(policySeverity);
-      policyContainer.appendChild(policyTagsDiv); // Tags moved to the bottom
+      // policyContainer.appendChild(policyTagsDiv); // Tags moved to the bottom
 
       // Append policyContainer to the nonCompliantDetailsDiv
       nonCompliantDetailsDiv.appendChild(policyContainer);
@@ -403,7 +406,7 @@ if (Array.isArray(section.NonCompliantPolicies) && section.NonCompliantPolicies.
 }
 
 
-
+/*
         // Create the Key Phrases section as tags
         if (Array.isArray(section.keyphrases) && section.keyphrases.length > 0) {
             const keyPhrasesDiv = document.createElement("div");
@@ -429,7 +432,9 @@ if (Array.isArray(section.NonCompliantPolicies) && section.NonCompliantPolicies.
 
             contentDiv.appendChild(keyPhrasesDiv);
         }
-
+        */
+        
+/*
         const goToButton = document.createElement("button");
         goToButton.classList.add("search-button");
         goToButton.textContent = "Go to";
@@ -439,6 +444,7 @@ if (Array.isArray(section.NonCompliantPolicies) && section.NonCompliantPolicies.
         });
 
         contentDiv.appendChild(goToButton);
+        */
 
         // Append the content div to the section container
         sectionDiv.appendChild(contentDiv);

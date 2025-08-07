@@ -591,7 +591,15 @@ export async function iteration_logic() {
     reviewContainer.style.display = "block";
     spinner.style.display = "none";
 
-let formatted = `<h2 style="margin-bottom: 20px; font-size: 22px; font-weight: 600; color: #2c3e50;">Unused Policies</h2>`;
+let formatted = `
+  <h2 style="
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24px;
+    margin-bottom: 12px;
+    color: #2c3e50;
+  ">Unused Policies</h2>`;
+
 pmessage.answer.forEach((item, index) => {
   formatted += `
     <div style="
@@ -602,14 +610,14 @@ pmessage.answer.forEach((item, index) => {
       overflow: hidden;
     ">
       <div style="
-        background: linear-gradient(90deg, #3a8bfd, #2c52ff);
-        color: #ffffff;
+        background: #4a4a4a;           /* Dark Grey Background */
+        color: white;
         font-weight: bold;
         padding: 14px 18px;
         font-size: 16px;
+        text-align: center;           /* Center align text */
       ">
         Policy - ${index + 1}
-
       </div>
 
       <div style="
@@ -619,51 +627,37 @@ pmessage.answer.forEach((item, index) => {
         gap: 16px;
       ">
 
-
         <div style="
-
           border: 1px solid #e0e0e0;
-
           background-color: #fafafa;
-
           padding: 12px;
-
           border-radius: 10px;
-
         ">
-
-          <div style="font-weight: bold; color: #004aad; margin-bottom: 4px;">Title</div>
-
+          <div style="
+            font-weight: bold; 
+            color: #2c3e50; 
+            margin-bottom: 4px;
+          ">Title</div>
           <div style="color: #333;">${item.Title}</div>
-
         </div>
 
- 
-
         <div style="
-
           border: 1px solid #e0e0e0;
-
           background-color: #fafafa;
-
           padding: 12px;
-
           border-radius: 10px;
-
         ">
-
-          <div style="font-weight: bold; color: #004aad; margin-bottom: 4px;">Summary</div>
-
+          <div style="
+            font-weight: bold; 
+            color: #2c3e50; 
+            margin-bottom: 4px;
+          ">Summary</div>
           <div style="color: #333;">${item.summary}</div>
-
         </div>
 
       </div>
-
     </div>
-
   `;
-
 });
 
  

@@ -24,7 +24,7 @@ from azure.search.documents.indexes.models import (
 
 # --- CONFIGURATION ---
 AZURE_SEARCH_ENDPOINT = "Write your AZURE_SEARCH_ENDPOINT here"
-AZURE_SEARCH_KEY = "Write your here"
+AZURE_SEARCH_KEY = "Write your AZURE_SEARCH_KEY here"
 DOC_INDEX = "legal-documents"
 POLICY_INDEX = "legal-instructions"
 AZURE_OPENAI_API_KEY = "Write your AZURE_OPENAI_API_KEY here"
@@ -309,4 +309,5 @@ def process_documents_from_blob():
         return_value = f"Failed to open Word document."
 
         return return_value
+
 

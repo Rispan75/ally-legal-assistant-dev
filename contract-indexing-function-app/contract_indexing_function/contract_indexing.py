@@ -260,7 +260,7 @@ def process_documents_from_blob():
         # List blobs in container
         # Azure Storage configuration
         ACCOUNT_NAME = "dekradocuments"
-        ACCOUNT_KEY = "TelPzk6QK7hbzSHdVxNJpPSCmDqg8OFzJcfCNNG8cL39NaDJNmZ2eX5pBRSJsQsUtz893GYdgmws+AStez621Q=="
+        ACCOUNT_KEY = "Write your ACCOUNT_KEY here"
         CONTAINER_NAME = "contractdocuments"
 
         # Initialize Blob service client
@@ -307,4 +307,5 @@ def process_documents_from_blob():
     except Exception as e2:
         print(f"Error in function app: {e2}")
         return_value = f"Failed to open Word document."
+
         return return_value

@@ -588,83 +588,160 @@ export async function iteration_logic() {
   indexbutton.classList.remove("disabled-style");
 
   if (response.ok) {
+
     reviewContainer.style.display = "block";
+
     spinner.style.display = "none";
 
+
+
 let formatted = `
-  <h2 style="
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 24px;
-    margin-bottom: 12px;
-    color: #2c3e50;
-  ">Unused Policies</h2>`;
 
-pmessage.answer.forEach((item, index) => {
-  formatted += `
-    <div style="
-      margin-bottom: 24px;
-      border-radius: 16px;
-      background-color: #ffffff;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    ">
-      <div style="
-        background: #4a4a4a;           /* Dark Grey Background */
-        color: white;
-        font-weight: bold;
-        padding: 14px 18px;
-        font-size: 16px;
-        text-align: center;           /* Center align text */
-      ">
-        Policy - ${index + 1}
-      </div>
+      <h2 style="
 
-      <div style="
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      ">
+        font-size: 18px;
+
+        font-weight: 700;
+
+        line-height: 24px;
+
+        margin-bottom: 12px;
+
+        color: #2c3e50;
+
+      ">Unused Policies</h2>`;
+
+
+
+    const oneTitle = pmessage.answer.length === 1 && pmessage.answer[0].Title === "No unused Policies";
+
+
+
+    pmessage.answer.forEach((item, index) => {
+
+      formatted += `
 
         <div style="
-          border: 1px solid #e0e0e0;
-          background-color: #fafafa;
-          padding: 12px;
-          border-radius: 10px;
+
+          margin-bottom: 24px;
+
+          border-radius: 16px;
+
+          background-color: #ffffff;
+
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+
+          overflow: hidden;
+
         ">
+
+          ${
+
+            !oneTitle
+
+              ? `<div style="
+
+                  background: #4a4a4a;
+
+                  color: white;
+
+                  font-weight: bold;
+
+                  padding: 14px 18px;
+
+                  font-size: 16px;
+
+                ">
+
+                  Policy - ${index + 1}
+
+                </div>`
+
+              : ''
+
+          }
+
+
+
           <div style="
-            font-weight: bold; 
-            color: #2c3e50; 
-            margin-bottom: 4px;
-          ">Title</div>
-          <div style="color: #333;">${item.Title}</div>
+
+            padding: 20px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 16px;
+
+          ">
+
+
+
+            <div style="
+
+              border: 1px solid #e0e0e0;
+
+              background-color: #fafafa;
+
+              padding: 12px;
+
+              border-radius: 10px;
+
+            ">
+
+              ${
+
+                oneTitle
+
+                  ? `${item.Title}`
+
+                  : `<div style="font-weight: bold; color: #2c3e50; margin-bottom: 4px;">Title</div>
+
+                     <div style="color: #333;">${item.Title}</div>`
+
+              }
+
+            </div>
+
+
+
+            <div style="
+
+              border: 1px solid #e0e0e0;
+
+              background-color: #fafafa;
+
+              padding: 12px;
+
+              border-radius: 10px;
+
+            ">
+
+              ${
+
+                oneTitle
+
+                  ? `${item.summary}`
+
+                  : `<div style="font-weight: bold; color: #2c3e50; margin-bottom: 4px;">Summary</div>
+
+                     <div style="color: #333;">${item.summary}</div>`
+
+              }
+
+            </div>
+
+
+
+          </div>
+
         </div>
 
-        <div style="
-          border: 1px solid #e0e0e0;
-          background-color: #fafafa;
-          padding: 12px;
-          border-radius: 10px;
-        ">
-          <div style="
-            font-weight: bold; 
-            color: #2c3e50; 
-            margin-bottom: 4px;
-          ">Summary</div>
-          <div style="color: #333;">${item.summary}</div>
-        </div>
+      `;
 
-      </div>
-    </div>
-  `;
-});
+    });
 
- 
 
- 
-
- 
 
     document.getElementById("iteration-container").innerHTML = formatted;
 
@@ -675,8 +752,6 @@ pmessage.answer.forEach((item, index) => {
     spinner.style.display = "none";
 
     document.getElementById("iteration-container").innerText = "Operation Failed";
-
- 
 
   }
 

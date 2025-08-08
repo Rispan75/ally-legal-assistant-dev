@@ -1,8 +1,8 @@
 {
     "prompt-flow-endpoint" : "http://localhost:8083/score",
     "config-prompt-flow-endpoint" : "http://localhost:8082/score",
-    "contract-indexing-function-app-endpoint" : "https://trigger-index-functionapp-h2g3exaabrd3abbe.westeurope-01.azurewebsites.net/api/contract_indexing_function?code=u9colIVH27mIH6LrW5OSPN_HeGfeAozC3-RV1cQLqq_DAzFuYo0axA==",
-    "clientId" : "692fe6c3-17fa-42a3-9c03-55f5227942e0",
+    "contract-indexing-function-app-endpoint" : "write your endpoint here",
+    "clientId" : "write your clientId here",
     "authority": "https://login.microsoftonline.com/common",
     "sso-enabled": false
 }

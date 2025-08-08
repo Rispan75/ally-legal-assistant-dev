@@ -3,7 +3,9 @@ from azure.search.documents import SearchClient
 from azure.core.credentials import AzureKeyCredential
 from promptflow.core import tool
 from promptflow.connections import CustomConnection
-from summary_full_doc import get_policyinfo_iteration
+from summary_full_doc import get_policyinfo
+
+
  
  
 # ------------------------------
@@ -60,17 +62,24 @@ def iterative_tool(searchconnection: CustomConnection, filename: str,language: s
     # Step 3: Fetch title and instruction for each unused PolicyId
     #logger.info(f"Fetching detailed info for {len(unused_policies)} unused policy IDs...")
     result_list = []
- 
-    for policy_id in sorted(unused_policies):
-        policy_info = get_policyinfo_iteration(policy_id, searchconnection)
-        result_list.append({
-            #"PolicyId": policy_id,
-            #"Title": policy_info.get("title", "N/A") if policy_info else "N/A",
-            #"Instruction": policy_info.get("instruction", "N/A") if policy_info else "N/A"
-            "Title": policy_info.get("title", "N/A"),
-            "summary":policy_info.get("summary","N/A") if policy_info else "N/A"
-            #"Instruction": policy_info.get("instruction", "N/A"),
- 
-        })
- 
+    if unused_policies==set():
+        result_list.append({ 
+        #"PolicyId": policy_id,
+        #"Title": policy_info.get("title", "N/A") if policy_info else "N/A",
+        #"Instruction": policy_info.get("instruction", "N/A") if policy_info else "N/A"
+        "Title": "No unused Policies",
+        "summary": "There are no unused policies because all policies are either compliant or non-compliant."
+        #"Instruction": policy_info.get("instruction", "N/A"),
+    })
+    else:
+        for policy_id in sorted(unused_policies):
+            policy_info = get_policyinfo(policy_id, searchconnection)
+            result_list.append({ 
+                #"PolicyId": policy_id,
+                #"Title": policy_info.get("title", "N/A") if policy_info else "N/A",
+                #"Instruction": policy_info.get("instruction", "N/A") if policy_info else "N/A"
+                "Title": policy_info.get("title", "N/A"),
+                "summary":policy_info.get("summary","N/A") if policy_info else "N/A"
+                #"Instruction": policy_info.get("instruction", "N/A"),
+            })
     return result_list 

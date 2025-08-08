@@ -23,12 +23,12 @@ from azure.search.documents.indexes.models import (
 )
 
 # --- CONFIGURATION ---
-AZURE_SEARCH_ENDPOINT = "https://aisearchally1.search.windows.net"
-AZURE_SEARCH_KEY = "MwXJMtkDGzjKT58DzgKxkI3oIW0pOOuE2ZoNdjJ55NAzSeA8QmsY"
+AZURE_SEARCH_ENDPOINT = "Write your AZURE_SEARCH_ENDPOINT here"
+AZURE_SEARCH_KEY = "Write your here"
 DOC_INDEX = "legal-documents"
 POLICY_INDEX = "legal-instructions"
-AZURE_OPENAI_API_KEY = "YgWv0MT3iVH0seuJbdYQnAiaIc87HdrMBgaqps5ADJuDJH8bQJfLJQQJ99BFAC5RqLJXJ3w3AAABACOGdWu4"
-AZURE_OPENAI_ENDPOINT = "https://openaially.openai.azure.com/"
+AZURE_OPENAI_API_KEY = "Write your AZURE_OPENAI_API_KEY here"
+AZURE_OPENAI_ENDPOINT = "Write your AZURE_OPENAI_ENDPOINT here"
 AZURE_OPENAI_DEPLOYMENT = "gpt-4o"
 AZURE_EMBEDDING_DEPLOYMENT = "text-embedding-ada-002"
 
@@ -309,3 +309,4 @@ def process_documents_from_blob():
         return_value = f"Failed to open Word document."
 
         return return_value
+

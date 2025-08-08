@@ -2,9 +2,10 @@
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=strgdatev;AccountKey="Write your account key here";EndpointSuffix=core.windows.net",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=strgdatev;AccountKey=Write your account key here;EndpointSuffix=core.windows.net",
     "AzureWebJobsSecretStorageType": "Files"
   }
 }
+
 
 

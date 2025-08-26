@@ -42,7 +42,11 @@ export async function document_summary() {
             },
             body: JSON.stringify({
               query_type: 1,
-              filename: localStorage.getItem('filename')
+              filename: localStorage.getItem('filename'),
+              question: "",
+              language: "",
+              chat_history:  [],
+              group: []
             })
           });
   

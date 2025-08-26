@@ -102,8 +102,10 @@ async function processSelectedText(text, endpoint, language) {
           query_type: 2,  
           question: text,  
           group: groups,  
-          language: language 
-      })  
+          language: language,
+          filename: localStorage.getItem('filename'),
+          chat_history:  []
+      }) 
   });  
 
   const data = await response.json();  

@@ -83,8 +83,9 @@ async function fetchData(endpoint, query, language, filename, groups) {
           question: query,  
           language: language,
           filename: filename,
-          groups: groups
-      })  
+          group: [],
+          chat_history:  []
+      })    
   });  
 }  
 

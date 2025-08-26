@@ -504,8 +504,11 @@ async function fetchData(endpoint, filename, groups ) {
       body: JSON.stringify({  
           query_type: 99,
           filename: filename,
-          groups: JSON.parse(groups)        
-      })  
+          group: JSON.parse(groups),
+          question: "",
+          language: "",
+          chat_history: [],
+      })    
   });  
 }  
 
@@ -561,15 +564,13 @@ export async function iteration_logic() {
     },
 
     body: JSON.stringify({
-
       query_type: 10,
-
       filename: filename,
-
       language: language,
-
+      question:  "",
+      chat_history:  [],
+      group:  ["default"]
     })
-
   });
 
  

@@ -339,24 +339,32 @@ function addCarouselButtons(contentDiv, correctedText) {
 }  
 
 // Replace selected text with corrected text  
-function fixText(correctedText) {  
-  Word.run(async (context) => {  
-      const selection = context.document.getSelection();  
-      selection.load("text");  
-      selection.font.strikeThrough = true;
-      await context.sync();  
-
-      // Replace the selected text with the corrected text  
-      selection.insertText(correctedText, Word.InsertLocation.after); 
-      
-      //insertCorrectedText(selectedOoxml) <------ Not working - not saving the formatting
-
-      await context.sync();  
-      //console.log("Text replaced with corrected text: ", correctedText);  
-  }).catch(function (error) {  
-      console.log("Error: " + error);  
-  });  
-}  
+function fixText(correctedText) {
+    Word.run(async (context) => {
+        const selection = context.document.getSelection();
+        selection.load("text");
+        await context.sync();
+ 
+        // Create a range for the selected text
+        const originalRange = selection;
+ 
+        // Insert a paragraph before with the corrected text in blue
+        const insertRange = originalRange.insertParagraph(correctedText, Word.InsertLocation.before);
+        insertRange.font.color = "blue";
+        insertRange.font.bold = false;
+        insertRange.spacingAfter = 6; // Adds space after corrected text
+ 
+        await context.sync();
+ 
+        // Now strike through the original and turn it red
+        originalRange.font.strikeThrough = true;
+        originalRange.font.color = "red";
+ 
+        await context.sync();
+    }).catch(function (error) {
+        console.log("Error: " + error);
+    });
+}
 
 // Go to the text in the document  
 function gotoText() {  

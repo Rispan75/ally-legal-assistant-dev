@@ -294,5 +294,5 @@ def process_directory(folder_path):
 
 # Run
 if __name__ == "__main__":
-    directory_path = "/policy_documents"  # Update your folder path here
+    directory_path = "policy_documents"  # Update your folder path here
     process_directory(directory_path)

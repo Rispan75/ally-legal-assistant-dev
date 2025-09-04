@@ -479,10 +479,12 @@ document.getElementById("language-select").onchange = function() {
 async function checkdocumentindex()
 {
   // check if the document has been indexed
-  console.log("check index")
+  console.log("check index function triggered")
   console.log(localStorage.getItem('filename'));
   const response = await fetchData(localStorage.getItem('pfendpoint'), localStorage.getItem('filename'), localStorage.getItem('groups'));       
+  
   const data = await response.json(); 
+  console.log("query 99 response: ", data.answer);
   console.log(data.answer.Found);
   
   if (data.answer.Found == false)
@@ -513,247 +515,126 @@ async function fetchData(endpoint, filename, groups ) {
 }  
 
 
-export async function iteration_logic() {  
-
+export async function iteration_logic() {
   const spinner = document.getElementById("iteration-spinner");
-
   const reviewContainer = document.getElementById("iteration-container");
-
   const indexbutton = document.getElementById("iteration-button");
 
- 
-
- 
-
-  // Show spinner and hide container
-
+  // Show spinner and disable the button
   spinner.style.display = "flex";
-
   indexbutton.disabled = true;
-
   indexbutton.classList.add("disabled-style");
-
- 
-
   reviewContainer.style.display = "block";
 
- 
-
- 
-
-  // Get function-app endpoint
-
+  // Get data from localStorage
   const pfendpoint = localStorage.getItem('pfendpoint');
-
   const filename = localStorage.getItem('filename');
-
   const language = localStorage.getItem('language');
 
- 
-
- 
-
-  const response = await fetch(pfendpoint, {
-
-    method: 'POST',
-
-    headers: {
-
-      'Content-Type': 'application/json'
-
-    },
-
-    body: JSON.stringify({
-      query_type: 10,
-      filename: filename,
-      language: language,
-      question:  "",
-      chat_history:  [],
-      group:  ["default"]
-    })
-  });
-
- 
-
-  const message = await response.text();
-
-  console.log(message);
-
- 
-
-  const pmessage = JSON.parse(message); // ✅ Use a different variable name
-
- 
-
-  indexbutton.disabled = false;
-  indexbutton.classList.remove("disabled-style");
-
-  if (response.ok) {
-
-    reviewContainer.style.display = "block";
-
-    spinner.style.display = "none";
-
-
-
-let formatted = `
-
-      <h2 style="
-
-        font-size: 18px;
-
-        font-weight: 700;
-
-        line-height: 24px;
-
-        margin-bottom: 12px;
-
-        color: #2c3e50;
-
-      ">Unused Policies</h2>`;
-
-
-
-    const oneTitle = pmessage.answer.length === 1 && pmessage.answer[0].Title === "No unused Policies";
-
-
-
-    pmessage.answer.forEach((item, index) => {
-
-      formatted += `
-
-        <div style="
-
-          margin-bottom: 24px;
-
-          border-radius: 16px;
-
-          background-color: #ffffff;
-
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-
-          overflow: hidden;
-
-        ">
-
-          ${
-
-            !oneTitle
-
-              ? `<div style="
-
-                  background: #4a4a4a;
-
-                  color: white;
-
-                  font-weight: bold;
-
-                  padding: 14px 18px;
-
-                  font-size: 16px;
-
-                ">
-
-                  Policy - ${index + 1}
-
-                </div>`
-
-              : ''
-
-          }
-
-
-
-          <div style="
-
-            padding: 20px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 16px;
-
-          ">
-
-
-
-            <div style="
-
-              border: 1px solid #e0e0e0;
-
-              background-color: #fafafa;
-
-              padding: 12px;
-
-              border-radius: 10px;
-
-            ">
-
-              ${
-
-                oneTitle
-
-                  ? `${item.Title}`
-
-                  : `<div style="font-weight: bold; color: #2c3e50; margin-bottom: 4px;">Title</div>
-
-                     <div style="color: #333;">${item.Title}</div>`
-
-              }
-
-            </div>
-
-
-
-            <div style="
-
-              border: 1px solid #e0e0e0;
-
-              background-color: #fafafa;
-
-              padding: 12px;
-
-              border-radius: 10px;
-
-            ">
-
-              ${
-
-                oneTitle
-
-                  ? `${item.summary}`
-
-                  : `<div style="font-weight: bold; color: #2c3e50; margin-bottom: 4px;">Summary</div>
-
-                     <div style="color: #333;">${item.summary}</div>`
-
-              }
-
-            </div>
-
-
-
-          </div>
-
-        </div>
-
-      `;
-
+  try {
+    const response = await fetch(pfendpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query_type: 10,
+        filename: filename,
+        language: language,
+        question: "",
+        chat_history: [],
+        group: ["default"]
+      })
     });
 
+    const message = await response.text();
+    console.log(message);
 
+    const pmessage = JSON.parse(message);
 
-    document.getElementById("iteration-container").innerHTML = formatted;
-
-  } else {
-
-    reviewContainer.style.display = "block";
-
+    // Enable the button and hide the spinner
+    indexbutton.disabled = false;
+    indexbutton.classList.remove("disabled-style");
     spinner.style.display = "none";
 
-    document.getElementById("iteration-container").innerText = "Operation Failed";
+    if (response.ok) {
+      reviewContainer.style.display = "block";
 
+      let formatted = `
+        <h2 style="
+          font-size: 18px;
+          font-weight: 700;
+          line-height: 24px;
+          margin-bottom: 12px;
+          color: #2c3e50;
+        ">Unused Policies</h2>
+      `;
+
+      const oneTitle = pmessage.answer.length === 1 && pmessage.answer[0].Title === "No unused Policies";
+
+      // Track visible (non-empty) item count for correct numbering
+      let visibleIndex = 1;
+
+      pmessage.answer.forEach((item) => {
+        // Skip items with no valid Title
+        if (!item.Title || item.Title.trim() === "") return;
+
+        formatted += `
+          <div style="
+            margin-bottom: 24px;
+            border-radius: 16px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+          ">
+            ${
+              !oneTitle
+                ? `<div style="
+                    background: #4a4a4a;
+                    color: white;
+                    font-weight: bold;
+                    padding: 14px 18px;
+                    font-size: 16px;
+                  ">
+                    Policy - ${visibleIndex++}
+                  </div>`
+                : ''
+            }
+
+            <div style="
+              padding: 20px;
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+            ">
+              <div style="
+                border: 1px solid #e0e0e0;
+                background-color: #fafafa;
+                padding: 12px;
+                border-radius: 10px;
+              ">
+                ${
+                  oneTitle
+                    ? `${item.Title}`
+                    : `<div style="font-weight: bold; color: #2c3e50; margin-bottom: 4px;">Title</div>
+                       <div style="color: #333;">${item.Title}</div>`
+                }
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById("iteration-container").innerHTML = formatted;
+    } else {
+      reviewContainer.style.display = "block";
+      document.getElementById("iteration-container").innerText = "Failed to load policies.";
+    }
+  } catch (error) {
+    spinner.style.display = "none";
+    reviewContainer.style.display = "block";
+    document.getElementById("iteration-container").innerText = "Error occurred while loading policies.";
+    console.error("Error:", error);
   }
-
 }
+

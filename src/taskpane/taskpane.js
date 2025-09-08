@@ -30,8 +30,17 @@ Office.onReady(async (info) => {
     document.getElementById("sideload-msg").style.display = "block"; 
     const filename = Office.context.document.url.split('\\').pop().split('/').pop() //fetching filename from Word API
     localStorage.setItem('filename', filename);
-
     
+    await Word.run(async (context) => {
+      const body = context.document.body;
+      body.load("text");
+      await context.sync();
+      const filecontent = body.text; //body.getOoxml()
+      localStorage.setItem('filecontent', filecontent);
+      console.log("Filecontent text: ");
+      console.log(filecontent);
+    });
+  
     
     
   if (localStorage.getItem('sso-enabled') == "true"){
@@ -213,6 +222,7 @@ export async function index_document() {
 
     const contract_index_endpoint = localStorage.getItem('contractindexendpoint');
     const filename = localStorage.getItem('filename');
+    const filecontent = localStorage.getItem('filecontent');
     const response = await fetch(contract_index_endpoint, {
       method: 'POST',
       headers: {
@@ -220,7 +230,8 @@ export async function index_document() {
       },
 
       body: JSON.stringify({
-        filename: filename
+        filename: filename,
+        filecontent: filecontent
       })
     });
 

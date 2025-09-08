@@ -1,4 +1,4 @@
-import os, re, uuid, json, tempfile
+import os, re, uuid, json, tempfile, logging
 from io import BytesIO
 from datetime import datetime, timezone
 from langdetect import detect
@@ -23,12 +23,12 @@ from azure.search.documents.indexes.models import (
 )
 
 # --- CONFIGURATION ---
-AZURE_SEARCH_ENDPOINT = "Write your AZURE_SEARCH_ENDPOINT here"
-AZURE_SEARCH_KEY = "Write your AZURE_SEARCH_KEY here"
+AZURE_SEARCH_ENDPOINT = "Use your key here"
+AZURE_SEARCH_KEY = "Use your key here"
 DOC_INDEX = "legal-documents"
 POLICY_INDEX = "legal-instructions"
-AZURE_OPENAI_API_KEY = "Write your AZURE_OPENAI_API_KEY here"
-AZURE_OPENAI_ENDPOINT = "Write your AZURE_OPENAI_ENDPOINT here"
+AZURE_OPENAI_API_KEY = "Use your key here"
+AZURE_OPENAI_ENDPOINT = "Use your key here"
 AZURE_OPENAI_DEPLOYMENT = "gpt-4o"
 AZURE_EMBEDDING_DEPLOYMENT = "text-embedding-ada-002"
 
@@ -194,53 +194,58 @@ def upload_chunk(fname, pid, title, body, lang, emb, comp_ids, nonc_ids, irr_ids
     print(f"[Uploaded] {fname} clause {pid}, compliant={doc['isCompliant']}")
 
 def create_index_if_not_exists():
-    client = SearchIndexClient(endpoint=AZURE_SEARCH_ENDPOINT, credential=AzureKeyCredential(AZURE_SEARCH_KEY))
-    if DOC_INDEX in [idx.name for idx in client.list_indexes()]:
-        print(f"[INFO] Index '{DOC_INDEX}' already exists.")
-        return
+    try:
+        client = SearchIndexClient(endpoint=AZURE_SEARCH_ENDPOINT, credential=AzureKeyCredential(AZURE_SEARCH_KEY))
+        if DOC_INDEX in [idx.name for idx in client.list_indexes()]: #error in this line
+            print(f"[INFO] Index '{DOC_INDEX}' already exists.")
+            return
 
-    fields = [
-        SimpleField(name="id", type=SearchFieldDataType.String, key=True),
-        SimpleField(name="ParagraphId", type=SearchFieldDataType.Int32, filterable=True, sortable=True),
-        SearchableField(name="title", type=SearchFieldDataType.String, filterable=True),
-        SearchableField(name="paragraph", type=SearchFieldDataType.String),
-        SearchField(name="embedding", type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
-                    searchable=True, vector_search_dimensions=1536, vector_search_profile_name="vsProfile"),
-        SimpleField(name="filename", type=SearchFieldDataType.String, filterable=True),
-        SimpleField(name="language", type=SearchFieldDataType.String, filterable=True),
-        SimpleField(name="isCompliant", type=SearchFieldDataType.Boolean, filterable=True),
-        SearchField(name="CompliantCollection", type=SearchFieldDataType.Collection(SearchFieldDataType.String)),
-        SearchField(name="NonCompliantCollection", type=SearchFieldDataType.Collection(SearchFieldDataType.String)),
-        SearchField(name="IrrelevantCollection", type=SearchFieldDataType.Collection(SearchFieldDataType.String)),
-        SearchField(name="group", type=SearchFieldDataType.Collection(SearchFieldDataType.String)),
-        SearchField(name="keyphrases", type=SearchFieldDataType.Collection(SearchFieldDataType.String)),
-        SearchableField(name="summary", type=SearchFieldDataType.String),
-        SimpleField(name="department", type=SearchFieldDataType.String, filterable=True),
-        SimpleField(name="date", type=SearchFieldDataType.String, filterable=True, sortable=True),
-    ]
+        fields = [
+            SimpleField(name="id", type=SearchFieldDataType.String, key=True),
+            SimpleField(name="ParagraphId", type=SearchFieldDataType.Int32, filterable=True, sortable=True),
+            SearchableField(name="title", type=SearchFieldDataType.String, filterable=True),
+            SearchableField(name="paragraph", type=SearchFieldDataType.String),
+            SearchField(name="embedding", type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
+                        searchable=True, vector_search_dimensions=1536, vector_search_profile_name="vsProfile"),
+            SimpleField(name="filename", type=SearchFieldDataType.String, filterable=True),
+            SimpleField(name="language", type=SearchFieldDataType.String, filterable=True),
+            SimpleField(name="isCompliant", type=SearchFieldDataType.Boolean, filterable=True),
+            SearchField(name="CompliantCollection", type=SearchFieldDataType.Collection(SearchFieldDataType.String)),
+            SearchField(name="NonCompliantCollection", type=SearchFieldDataType.Collection(SearchFieldDataType.String)),
+            SearchField(name="IrrelevantCollection", type=SearchFieldDataType.Collection(SearchFieldDataType.String)),
+            SearchField(name="group", type=SearchFieldDataType.Collection(SearchFieldDataType.String)),
+            SearchField(name="keyphrases", type=SearchFieldDataType.Collection(SearchFieldDataType.String)),
+            SearchableField(name="summary", type=SearchFieldDataType.String),
+            SimpleField(name="department", type=SearchFieldDataType.String, filterable=True),
+            SimpleField(name="date", type=SearchFieldDataType.String, filterable=True, sortable=True),
+        ]
+        logging.info("dbc104")
+        vector_config = VectorSearch(
+            algorithms=[HnswAlgorithmConfiguration(
+                name="vsAlgo",
+                kind=VectorSearchAlgorithmKind.HNSW,
+                parameters=HnswParameters(metric=VectorSearchAlgorithmMetric.COSINE, m=4, ef_construction=200, ef_search=100)
+            )],
+            profiles=[VectorSearchProfile(name="vsProfile", algorithm_configuration_name="vsAlgo")]
+        )
 
-    vector_config = VectorSearch(
-        algorithms=[HnswAlgorithmConfiguration(
-            name="vsAlgo",
-            kind=VectorSearchAlgorithmKind.HNSW,
-            parameters=HnswParameters(metric=VectorSearchAlgorithmMetric.COSINE, m=4, ef_construction=200, ef_search=100)
-        )],
-        profiles=[VectorSearchProfile(name="vsProfile", algorithm_configuration_name="vsAlgo")]
-    )
-
-    index = SearchIndex(name=DOC_INDEX, fields=fields, vector_search=vector_config)
-    client.create_index(index)
-    print(f"[INFO] Index '{DOC_INDEX}' created.")
+        index = SearchIndex(name=DOC_INDEX, fields=fields, vector_search=vector_config)
+        client.create_index(index)
+        print(f"[INFO] Index '{DOC_INDEX}' created.")
+    except:
+        logging.info("Error in creating index function.")
 
 
-def process_document(path, filenamee):
-    fname = filenamee
-    txt = extract_docx_text(path) if fname.lower().endswith(".docx") else extract_pdf_text(path) 
+#driver functions
+def process_document(filename, filecontent):
+    fname = filename
+    #txt = extract_docx_text(path) if fname.lower().endswith(".docx") else extract_pdf_text(path) 
+    txt = filecontent
     lang = detect_language(txt)
     print(f"[INFO] Detected language: {lang}")
     policies = [p for p in load_policies() if p["language"].lower() == lang.lower()]
     clauses = smart_split_document(txt)
-    print(f"[INFO] Extracted {len(clauses)} clauses")
+    print(f"[INFO] Extracted {len(clauses)} clauses.")
 
     for cl in clauses:
         body = cl["text"].strip()
@@ -253,61 +258,17 @@ def process_document(path, filenamee):
         comp_ids, nonc_ids, irr_ids = check_compliance_with_gpt(body, policies)
         upload_chunk(fname, cl["id"], title, body, lang, emb, comp_ids, nonc_ids, irr_ids, keyphrases, summary)
 
-def process_documents_from_blob():
+
+def process_documents_from_blob(filename, filecontent):
     create_index_if_not_exists()
-    
+    return_value = "good"
     try:
-        # List blobs in container
-        # Azure Storage configuration
-        ACCOUNT_NAME = "dekradocuments"
-        ACCOUNT_KEY = "Write your ACCOUNT_KEY here"
-        CONTAINER_NAME = "contractdocuments"
+        print(f"[PROCESSING] {filename}")
+        process_document(filename, filecontent)
+    except Exception as e:
+        print(f"[ERROR] Failed to process document - {filename}: {e}")
+        return_value = "bad"
+    return return_value
 
-        # Initialize Blob service client
-        credential = AzureNamedKeyCredential(ACCOUNT_NAME, ACCOUNT_KEY)
-        blob_service_client = BlobServiceClient(
-            account_url=f"https://{ACCOUNT_NAME}.blob.core.windows.net",
-            credential=credential
-        )
-        container_client = blob_service_client.get_container_client(CONTAINER_NAME)
-        blob_list = container_client.list_blobs()
-    except Exception as e3:
-        print(f"Error connecting to Blob storage: {e3}")
-        return_value = f"Error connecting to Blob storage."
-        return return_value
-    
-    try:
-        return_value = "good"
-        for blob in blob_list:
-            try:
-                if blob.name.lower().endswith((".docx", ".pdf")):
-                    print(f"[DOWNLOADING] {blob.name}")
-                    blob_client = container_client.get_blob_client(blob.name)
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp_file:
-                        try:
-                            download_stream = blob_client.download_blob()
-                            tmp_file.write(download_stream.readall())
-                            temp_file_path = tmp_file.name
-                        except Exception as e:
-                            print(f"Failed to download blob {blob.name}: {e}")
-                            continue
-                    try:
-                        print(f"[PROCESSING] {blob.name}")
-                        process_document(temp_file_path, blob.name)
-                    except Exception as e:
-                        print(f"[ERROR] Failed to process {blob.name}: {e}")
-                    finally:
-                        os.remove(temp_file_path)  # Clean up the disk
-            except Exception as e:
-                print(f"Failed to open Word document: {blob.name} | Error: {e}")
-                return_value = f"Failed to open Word document."
-                print("return_value = ",return_value)
-                return return_value # Assuming if one and only one file fails to process, indexing operation will fail.
-        return return_value
-    except Exception as e2:
-        print(f"Error in function app: {e2}")
-        return_value = f"Failed to open Word document."
-
-        return return_value
 
 

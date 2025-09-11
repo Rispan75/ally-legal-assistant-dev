@@ -12,7 +12,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         filename = req_body.get("filename")
         filecontent = req_body.get("filecontent")
 
-        return_value = contract_indexing.process_documents_from_blob(filename, filecontent)
+        return_value = contract_indexing.process_documents_main(filename, filecontent)
         
         if return_value=="good":
             print("return value is passed as good")

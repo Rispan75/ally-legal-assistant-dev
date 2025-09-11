@@ -265,78 +265,90 @@ function addPolicyDetails(contentDiv, item, index) {
   }  
 }  
 
+
+// Update the carousel text and index number
+function updateCarousel(correctedTextDiv, variationNumber, variations, currentIndex) {
+  correctedTextDiv.textContent = variations[currentIndex];
+  variationNumber.textContent = `${currentIndex + 1}/${variations.length}`;
+}
+
+
+
 // Add a carousel for corrected text variations  
-function addCarousel(contentDiv, variations) {  
-  let currentIndex = 0;  
+function addCarousel(contentDiv, variations) {
+  let currentIndex = 0;
 
-  const carouselDiv = document.createElement("div");  
-  carouselDiv.classList.add("carousel-container");  
+  const carouselDiv = document.createElement("div");
+  carouselDiv.classList.add("carousel-container");
 
-  const correctedTextDiv = document.createElement("div");  
-  correctedTextDiv.classList.add("carousel-text");  
-  correctedTextDiv.textContent = variations[currentIndex];  
+  const correctedTextDiv = document.createElement("div");
+  correctedTextDiv.classList.add("carousel-text");
+  correctedTextDiv.textContent = variations[currentIndex];
 
-  const variationNumber = document.createElement("div");  
-  variationNumber.classList.add("variation-number");  
-  variationNumber.textContent = `${currentIndex + 1}/${variations.length}`;  
+  const variationNumber = document.createElement("div");
+  variationNumber.classList.add("variation-number");
+  variationNumber.textContent = `${currentIndex + 1}/${variations.length}`;
 
-  const leftButton = document.createElement("button");  
-  leftButton.classList.add("carousel-button", "carousel-left");  
-  leftButton.textContent = "◀";  
-  leftButton.addEventListener("click", () => {  
-      if (currentIndex > 0) {  
-          currentIndex--;  
-          updateCarousel(correctedTextDiv, variationNumber, variations, currentIndex);  
-      }  
-  });  
+  const leftButton = document.createElement("button");
+  leftButton.classList.add("carousel-button", "carousel-left");
+  leftButton.textContent = "◀";
+  leftButton.addEventListener("click", () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateCarousel(correctedTextDiv, variationNumber, variations, currentIndex);
+    }
+  });
 
-  const rightButton = document.createElement("button");  
-  rightButton.classList.add("carousel-button", "carousel-right");  
-  rightButton.textContent = "▶";  
-  rightButton.addEventListener("click", () => {  
-      if (currentIndex < variations.length - 1) {  
-          currentIndex++;  
-          updateCarousel(correctedTextDiv, variationNumber, variations, currentIndex);  
-      }  
-  });  
+  const rightButton = document.createElement("button");
+  rightButton.classList.add("carousel-button", "carousel-right");
+  rightButton.textContent = "▶";
+  rightButton.addEventListener("click", () => {
+    if (currentIndex < variations.length - 1) {
+      currentIndex++;
+      updateCarousel(correctedTextDiv, variationNumber, variations, currentIndex);
+    }
+  });
 
-  carouselDiv.appendChild(leftButton);  
-  carouselDiv.appendChild(correctedTextDiv);  
-  carouselDiv.appendChild(rightButton);  
-  carouselDiv.appendChild(variationNumber);  
+  carouselDiv.appendChild(leftButton);
+  carouselDiv.appendChild(correctedTextDiv);
+  carouselDiv.appendChild(rightButton);
+  carouselDiv.appendChild(variationNumber);
 
-  contentDiv.appendChild(carouselDiv);  
+  contentDiv.appendChild(carouselDiv);
 
-  addCarouselButtons(contentDiv, variations[currentIndex]);  
-}  
-
-// Update carousel display  
-function updateCarousel(correctedTextDiv, variationNumber, variations, currentIndex) {  
-  correctedTextDiv.textContent = variations[currentIndex];  
-  variationNumber.textContent = `${currentIndex + 1}/${variations.length}`;  
-}  
+  // ✅ Pass function that returns currently displayed variation
+  addCarouselButtons(contentDiv, () => variations[currentIndex]);
+}
 
 // Add buttons for interacting with carousel content  
-function addCarouselButtons(contentDiv, correctedText) {  
-  const buttonContainer = document.createElement("div");  
-  buttonContainer.classList.add("button-container");  
+function addCarouselButtons(contentDiv, getCurrentCorrectedText) {
+  const buttonContainer = document.createElement("div");
+  buttonContainer.classList.add("button-container");
 
-  const fixButton = document.createElement("button");  
-  fixButton.textContent = "Mark-up";  
-  fixButton.classList.add("search-button");  
-  fixButton.addEventListener("click", () => fixText(correctedText));  
-  contentDiv.appendChild(fixButton);  
+  const fixButton = document.createElement("button");
+  fixButton.textContent = "Mark-up";
+  fixButton.classList.add("search-button");
 
-  contentDiv.appendChild(document.createElement("p"));  // Add space  
+  fixButton.addEventListener("click", () => {
+    const correctedText = getCurrentCorrectedText(); // ✅ Get the live/current value
+    fixText(correctedText);
+  });
+  contentDiv.appendChild(fixButton);
+  contentDiv.appendChild(document.createElement("p"));  // Add space
 
-  const gotoButton = document.createElement("button");  
-  gotoButton.textContent = "Go To";  
-  gotoButton.classList.add("search-button");  
-  gotoButton.addEventListener("click", () => gotoText(correctedText));  
-  contentDiv.appendChild(gotoButton);  
+  const gotoButton = document.createElement("button");
+  gotoButton.textContent = "Go To";
+  gotoButton.classList.add("search-button");
 
-  contentDiv.appendChild(buttonContainer);  
-}  
+  gotoButton.addEventListener("click", () => {
+    const correctedText = getCurrentCorrectedText(); // Optional: use for 'Go To' if needed
+    gotoText(correctedText);
+  });
+
+  contentDiv.appendChild(gotoButton);
+  contentDiv.appendChild(buttonContainer);
+}
+
 
 // Replace selected text with corrected text  
 function fixText(correctedText) {
